@@ -3,6 +3,7 @@ import ItemDetail from "./ItemDetail";
 import { deleteItem } from "./actions";
 import { useDispatch } from "react-redux";
 import { sortItems } from "./actions";
+import "./App.css";
 
 function List({ items }) {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -14,11 +15,17 @@ function List({ items }) {
     setFilterName(e.target.value);
   };
 
-  const itemNames = [...new Set(items.map((item) => item.itemName))];
+  const handleFilterBlur = () => {
+    setFilterName("");
+  };
 
-  const filteredItems = items.filter((item) =>
-    filterName ? item.itemName.toLowerCase() === filterName.toLowerCase() : true
-  );
+  const filteredItems = filterName
+    ? items.filter((item) =>
+        item.itemName.toLowerCase().includes(filterName.toLowerCase())
+      )
+    : items;
+
+  const itemNames = [...new Set(items.map((item) => item.itemName))];
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
@@ -44,30 +51,20 @@ function List({ items }) {
     <div>
       <label>
         Filter by Name:
-        <select value={filterName} onChange={handleFilterChange}>
-          <option value="">All</option>
-          {itemNames.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
+        <input
+          type="text"
+          value={filterName}
+          onChange={handleFilterChange}
+          onBlur={handleFilterBlur}
+        />
       </label>
-      <ul>
-        {filteredItems.map((item) => (
-          <li key={item.id}>
-            <h3>{item.itemName}</h3>
-            <p>Description: {item.description}</p>
-            <p>Price: {item.price}</p>
-          </li>
-        ))}
-      </ul>
-      <button onClick={handleSort} className="sort-button">
+      <br />
+      <button class="button" onClick={handleSort}>
         Sort Cheapest to Expensive
       </button>
-
-      {itemList.map((item) => (
+      {filteredItems.map((item) => (
         <div
+          //   classname="item-card"
           key={item.id}
           onClick={(event) => {
             // if it's the delete button then return immediately/early (a bit hacky)
@@ -77,11 +74,17 @@ function List({ items }) {
             handleItemClick(item);
           }}
         >
-          <h3>{item.itemName}</h3>
-          <img src={item.image} alt={item.itemName} />
-          <button onClick={() => handleDelete(item.id)}>Delete</button>
+          <h4>{item.itemName}</h4>
+
+          <img class="image" src={item.image} alt={item.itemName} />
+
+          <br />
+          <button class="button" onClick={() => handleDelete(item.id)}>
+            Delete
+          </button>
         </div>
       ))}
+
       {selectedItem && <ItemDetail item={selectedItem} onClose={handleClose} />}
     </div>
   );

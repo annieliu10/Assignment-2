@@ -9,9 +9,10 @@ import { addItem } from "./actions";
 
 function App({ items }) {
   return (
-    <div>
-      <h1>Item List</h1>
+    <div class="flex-container">
+      <h1>Item Form</h1>
       <ItemForm />
+      <h1>Item List</h1>
       <List items={items} />
     </div>
   );
