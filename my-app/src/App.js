@@ -7,13 +7,13 @@ import ItemForm from "./ItemForm";
 import { connect } from "react-redux";
 import { addItem } from "./actions";
 
-function App({ items }) {
+function App() {
   return (
     <div class="flex-container">
       <h1>Item Form</h1>
       <ItemForm />
       <h1>Item List</h1>
-      <List items={items} />
+      <List />
     </div>
   );
 }

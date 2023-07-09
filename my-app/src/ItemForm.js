@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addItem } from "./actions";
 import "./App.css";
+import { addItemAsync } from "./redux/thunks";
 
 function ItemForm() {
   const [itemName, setItemName] = useState("");
@@ -36,7 +36,7 @@ function ItemForm() {
       price,
       image,
     };
-    dispatch(addItem(newItem));
+    dispatch(addItemAsync(newItem));
     // Clear inputs
     setItemName("");
     setDescription("");
