@@ -3,12 +3,11 @@ const getItems = async () => {
     method: "GET",
   });
   const data = await response.json();
-  console.log(data);
   return data;
 };
 
 const getItem = async (item) => {
-  const response = await fetch(`http://localhost:3000/items/${item.itemName}`, {
+  const response = await fetch(`http://localhost:3000/items/${item.name}`, {
     method: "GET",
   });
   const data = await response.json();
@@ -37,7 +36,7 @@ const sortItems = async () => {
 };
 
 const updateItem = async (item) => {
-  const response = await fetch(`http://localhost:3000/items/${item.itemName}`, {
+  const response = await fetch(`http://localhost:3000/items/${item.name}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),

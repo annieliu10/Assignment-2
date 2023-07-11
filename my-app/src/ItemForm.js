@@ -4,10 +4,12 @@ import "./App.css";
 import { addItemAsync } from "./redux/thunks";
 
 function ItemForm() {
-  const [itemName, setItemName] = useState("");
+  const [name, setItemName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [image, setImage] = useState("");
+  const [image_url, setImage] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [supplier, setSupplier] = useState("");
 
   const dispatch = useDispatch();
 
@@ -19,9 +21,17 @@ function ItemForm() {
     setDescription(e.target.value);
   };
 
+  const handleSupplierChange = (e) => {
+    setSupplier(e.target.value);
+  }
+
   const handlePriceChange = (e) => {
     setPrice(Number(e.target.value));
   };
+
+  const handleQuantityChange = (e) => {
+    setQuantity(Number(e.target.value));
+  }
 
   const handleImageChange = (e) => {
     setImage(e.target.value);
@@ -31,10 +41,10 @@ function ItemForm() {
     // prevent the page from refreshing when the form is submitted
     e.preventDefault();
     const newItem = {
-      itemName,
+      name,
       description,
       price,
-      image,
+      image_url,
     };
     dispatch(addItemAsync(newItem));
     // Clear inputs
@@ -60,7 +70,7 @@ function ItemForm() {
           <input
             class="normal-input"
             type="text"
-            value={itemName}
+            value={name}
             onChange={handleItemNameChange}
           />
         </label>
@@ -75,6 +85,15 @@ function ItemForm() {
         </label>
         <br />
         <label>
+          Supplier:
+          <textarea
+            class="normal-input"
+            value={supplier}
+            onChange={handleSupplierChange}
+          />
+        </label>
+        <br />
+        <label>
           Price:
           <input
             class="normal-input"
@@ -85,11 +104,21 @@ function ItemForm() {
         </label>
         <br />
         <label>
+          Quantity:
+          <input
+            class="normal-input"
+            type="text"
+            value={quantity}
+            onChange={handleQuantityChange}
+          />
+        </label>
+        <br />
+        <label>
           Image:
           <input
             class="normal-input"
             type="text"
-            value={image}
+            value={image_url}
             onChange={handleImageChange}
           />
         </label>

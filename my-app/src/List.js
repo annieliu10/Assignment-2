@@ -8,8 +8,6 @@ import axios from "axios";
 
 import {
   getItemsAsync,
-  sortItemsAsync,
-  getItemAsync,
   updateItemAsync,
 } from "./redux/thunks";
 
@@ -17,12 +15,11 @@ function List() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const items = useSelector((state) => state.items.list);
-  const filteredItems = useSelector((state) => state.items.filteredItems);
   const dispatch = useDispatch();
   const [updatedPrice, setUpdatedPrice] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleItemClick = (item) => {
-    dispatch(getItemAsync(item.id));
     setSelectedItem(item);
   };
 
@@ -30,9 +27,23 @@ function List() {
     setSelectedItem(null);
   };
 
+  const handleSearch = async (event) => {
+    const searchTerm = event.target.value;
+    setSearchTerm(searchTerm);
+  
+    try {
+      const response = await axios.get(`http://localhost:3000/items/${searchTerm}`);
+      const filteredItems = response.data;
+      // Update the state or perform any additional actions with the filtered items
+      console.log("Filtered Items:", filteredItems);
+    } catch (error) {
+      console.error("Error filtering items:", error);
+    }
+  };
+
   const handleDelete = (item) => {
     axios
-      .delete(`http://localhost:3000/items/${item.itemName}`)
+      .delete(`http://localhost:3000/items/${item.name}`)
       .then((response) => {
         // Item deleted successfully
         // You can perform any additional actions or update the state as needed
@@ -55,26 +66,27 @@ function List() {
   const handleSubmitPrice = (item) => {
     const updatedItem = { ...item, price: Number(updatedPrice) };
     dispatch(updateItemAsync(updatedItem));
-    setUpdatedPrice(0);
-    // window.location.reload();
-  };
-
-  const handleSort = () => {
-    dispatch(sortItemsAsync());
+    setUpdatedPrice(updatedPrice);
     window.location.reload();
   };
 
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   useEffect(() => {
-    console.log("Load items");
     dispatch(getItemsAsync());
   }, []);
 
   return (
     <div>
-      <button class="button" onClick={handleSort}>
-        Sort Cheapest to Expensive
-      </button>
-      {items.map((item) => (
+      <input
+        type="text"
+        placeholder="Search item..."
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+    {filteredItems.map((item) => (
         <div
           key={item.id}
           onClick={(event) => {
@@ -89,9 +101,9 @@ function List() {
             handleItemClick(item);
           }}
         >
-          <h4>{item.itemName}</h4>
+          <h4>{item.name}</h4>
 
-          <img class="image" src={item.image} alt={item.itemName} />
+          <img class="image" src={item.image_url} alt={item.name} />
           <div className="price-input">
             <input
               type="number"
