@@ -2,10 +2,12 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var mongoClient = require("mongodb");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var itemsRouter = require("./routes/items");
+
 
 var app = express();
 const cors = require("cors");

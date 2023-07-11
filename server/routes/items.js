@@ -1,32 +1,65 @@
 var express = require("express");
+const { connect } = require("http2");
 var router = express.Router();
+const { MongoClient } = require("mongodb");
+var url = "mongodb+srv://m001-student:m001-mongodb-basics@cluster0.ywcljgf.mongodb.net/?retryWrites=true&w=majority";
+var client = new MongoClient(url);
+const dbName = "inventory";
+const collectionName = "inventory_items";
 
-var items = [
-  {
-    id: 1,
-    itemName: "Bananas",
-    description: "Description of Item 1",
-    price: 3.99,
-    image:
-      "https://www.thespruceeats.com/thmb/iuLwY6XcVsDZRTG3Cj3NkhuKERQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/vegan-chocolate-peanut-butter-banana-smoothie-1000994-bananas-cropped-e4bdab5174cf461baf30bcdb8193c3e0.jpg",
-  },
-  {
-    id: 2,
-    itemName: "Apples",
-    description: "Description of Item 2",
-    price: 2.99,
-    image:
-      "https://parade.com/.image/t_share/MTkwNTgxNDY1MzcxMTkxMTY0/different-types-of-apples-jpg.jpg",
-  },
-];
+async function connectToMongo() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 
 /* GET the list of items. */
-router.get("/", function (req, res, next) {
-  return res.send(items);
+router.get("/", async function (req, res, next) {
+  try {
+    const items = await retrieveAllDocuments();
+    console.log("Retrieved Documents:");
+    console.log(items);
+    return res.send(items);
+  } catch (error) {
+    console.error("Error retrieving documents", error);
+    return res.status(500).send({ error: "Internal Server Error" });
+  }
 });
+ 
+async function retrieveAllDocuments() {
+  try {
+    await connectToMongo();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+    const items = await collection.find().toArray();
+    return items;
+  } catch (error) {
+    console.error("Error retrieving documents", error);
+    throw error;
+  }
+}
+
+async function addNewDocument(newItem) {
+  try {
+    await connectToMongo();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+    const result = await collection.insertOne(newItem);
+    return result.insertedId;
+  } catch (error) {
+    console.error("Error adding item to collection", error);
+    throw error;
+  }
+}
+
+
 
 router.post("/", function (req, res, next) {
-  if (!req.body.itemName) {
+  if (!req.body.name) {
     return res.status(400).send({ error: "Item Name must be provided." });
   }
   description = null;
@@ -39,69 +72,112 @@ router.post("/", function (req, res, next) {
   if (!req.body.price) {
     return res.status(400).send({ error: "Price must be provided." });
   }
-  if (!req.body.image) {
+  if (!req.body.quantity){
+    return res.status(400).send({ error: "Quantity must be provided." });
+ }  
+ if (!req.body.image_url) {
     return res.status(400).send({ error: "Image must be provided." });
+  }
+  if(!req.body.supplier) {
+    return res.status(400).send({ error: "Supplier must be provided." });
   }
 
   const newItem = {
-    id: items.length + 1,
-    itemName: req.body.itemName,
+    name: req.body.name,
     description: description,
     price: req.body.price,
-    image: req.body.image,
+    quantity: req.body.quantity,
+    supplier: req.body.supplier,
+    image_url: req.body.image_url,
   };
-  items.push(newItem);
+  addNewDocument(newItem);
   return res.send(newItem);
 });
 
-router.delete("/:itemName", function (req, res, next) {
-  const item = items.find((i) => i.itemName === req.params.itemName);
-  if (!item) {
-    return res.status(404).send({ error: "Item not found." });
+router.delete("/:name", async function (req, res, next) {
+  try {
+    const result = await deleteDocument(req.params.name);
+    if (result === 0) {
+      return res.status(404).send({ error: "Item not found." });
+    }
+    return res.send({ success: true });
+  } catch (error) {
+    console.error("Error deleting item from collection", error);
+    return res.status(500).send({ error: "Internal Server Error" });
   }
-  const index = items.indexOf(item);
-  items.splice(index, 1);
-  return res.send(item);
 });
 
-//Ability to fetch extra information when the item is clicked (not already fetched from server)
-router.get("/:itemname", function (req, res, next) {
-  const item = items.find((i) => i.itemName === req.params.itemname);
-  if (!item) {
-    return res.status(404).send({ error: "Item not found." });
+async function deleteDocument(name) {
+  try {
+    await connectToMongo();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+    const result = await collection.deleteOne({ name: name });
+    return result.deletedCount;
+  } catch (error) {
+    console.error("Error deleting item from collection", error);
+    throw error;
   }
-  return res.send(item);
-});
+}
 
-//Ability to filter on item name when fetching
-router.get("/filter/:itemname", function (req, res, next) {
-  const item = items.find((i) => i.itemName === req.params.itemname);
-  if (!item) {
-    return res.status(404).send({ error: "Item not found." });
-  }
-  return res.send(item);
-});
 
-//Ability to sort items by price when fetching all items(ascending)
-router.get("/sort/items", function (req, res, next) {
-  items.sort((a, b) => a.price - b.price);
-  return res.send(items);
-});
-
-router.patch("/:itemName", function (req, res, next) {
-  if (!req.params.itemName) {
-    return res.status(400).send({ error: "Item Name must be provided." });
-  }
+router.patch("/:name", async function (req, res, next) {
   if (!req.body.price) {
     return res.status(400).send({ error: "Price must be provided." });
   }
-  for (let item of items) {
-    if (item.itemName == req.params.itemName) {
-      item.price = req.body.price;
-      return res.send(item);
+  try {
+    const result = await updateDocument(req.params.name, req.body.price);
+    if (result === 0) {
+      return res.status(404).send({ error: "Item not found." });
     }
+    return res.send({ success: true });
+  } catch (error) {
+    console.error("Err");
+}}
+);
+
+async function updateDocument( name, price) {
+  try {
+    await connectToMongo();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+    const result = await collection.updateOne(
+      { name: name },
+      { $set: { price: price } }
+    );
+    return result.modifiedCount;
+  } catch (error) {
+    console.error("Error updating item", error);
+    throw error;
   }
-  return res.status(404).send({ error: "Item not found." });
+}
+
+
+router.get("/:name", async function (req, res, next) {
+  try {
+    const result = await filterItem(req.params.name);
+    if (result === 0) {
+      return res.status(404).send({ error: "Item not found." });
+    }
+    return res.send(result);
+  } catch (error) {
+    console.error("Error updating item", error);
+    throw error;
+  }
 });
+
+async function filterItem( name) {
+  try {
+    await connectToMongo();
+    const database = client.db(dbName);
+    const collection = database.collection(collectionName);
+    const result = await collection.find({ name: name });
+    return result;
+  } catch (error) {
+    console.error("Error updating item", error);
+    throw error;
+  }
+}
+
 
 module.exports = router;
