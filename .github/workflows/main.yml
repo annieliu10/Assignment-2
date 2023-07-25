@@ -25,8 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm run install-server && npm run install-client
 
+      - name: Run client tests
+        run: cd my-app && npm test
+        
       - name: Run server tests
         run: cd server && npm test
 
-      - name: Run client tests
-        run: cd my-app && npm test
