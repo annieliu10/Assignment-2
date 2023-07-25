@@ -115,6 +115,7 @@ async function deleteDocument(name) {
     const database = client.db(dbName);
     const collection = database.collection(collectionName);
     console.log(name);
+    name = name.trim();
     const result = await collection.deleteOne({ name: name });
     console.log("WHATTT");
     console.log(result.deletedCount);
