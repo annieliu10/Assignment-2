@@ -19,5 +19,12 @@
     "@babel/preset-react": "^7.22.5",
     "jest": "^29.6.1",
     "supertest": "^6.3.3"
-  }
+  },
+  "dependencies": {
+    "mongodb": "^5.7.0"
+  },
+  "presets": [
+    "@babel/preset-react",
+    "@babel/preset-env"
+  ]
 }
