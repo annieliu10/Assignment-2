@@ -48,7 +48,7 @@ function List() {
         // Item deleted successfully
         // You can perform any additional actions or update the state as needed
         console.log("Item deleted:", response.data);
-        dispatch(deleteItem(item));
+        // dispatch(deleteItem(item));
       })
       .catch((error) => {
         // Error occurred while deleting item

@@ -45,6 +45,8 @@ function ItemForm() {
       description,
       price,
       image_url,
+      quantity,
+      supplier,
     };
     dispatch(addItemAsync(newItem));
     // Clear inputs
