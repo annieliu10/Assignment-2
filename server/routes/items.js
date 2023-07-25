@@ -96,14 +96,16 @@ router.post("/", function (req, res, next) {
 
 router.delete("/:name", async function (req, res, next) {
   try {
-    const result = await deleteDocument(req.params.name);
-    if (result === 0) {
-      return res.status(404).send({ error: "Item not found." });
+    console.log("whyyy");
+    const deletedQuestion = await deleteDocument(req.params.name);
+    if (!deletedQuestion) {
+      console.log("what");
+      return res.status(404).send("Question not found");
     }
-    return res.send({ success: true });
-  } catch (error) {
-    console.error("Error deleting item from collection", error);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.send({ message: "Question deleted" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send("An error occurred");
   }
 });
 
@@ -112,7 +114,10 @@ async function deleteDocument(name) {
     await connectToMongo();
     const database = client.db(dbName);
     const collection = database.collection(collectionName);
+    console.log(name);
     const result = await collection.deleteOne({ name: name });
+    console.log("WHATTT");
+    console.log(result.deletedCount);
     return result.deletedCount;
   } catch (error) {
     console.error("Error deleting item from collection", error);
