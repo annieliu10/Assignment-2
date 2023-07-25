@@ -4,17 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/annieliu10/Assignment-2.git"
+    "install-server": "cd server && npm install",
+    "start-server": "cd server && node app.js",
+    "install-client": "cd my-app && npm install",
+    "build-client": "cd my-app && npm run build",
+    "start-client": "cd my-app && npm run start"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/annieliu10/Assignment-2/issues"
-  },
-  "homepage": "https://github.com/annieliu10/Assignment-2#readme"
+  "license": "ISC"
 }
