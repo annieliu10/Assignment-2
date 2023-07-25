@@ -25,10 +25,10 @@ describe('ItemForm Endpoints', () => {
     db = client.db('inventory');
   });
 
-  afterAll(async () => {
-    // Close the MongoDB client
-    await client.close();
-  });
+//   afterAll(async () => {
+//     // Close the MongoDB client
+//     await client.close();
+//   });
 
   beforeEach(async () => {
     // Clear the test database before each test
