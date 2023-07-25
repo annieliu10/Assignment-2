@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addItem } from "./actions";
+import "./App.css";
+import { addItemAsync } from "./redux/thunks";
 
 function ItemForm() {
-  const [itemName, setItemName] = useState("");
+  const [name, setItemName] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(0);
-  const [image, setImage] = useState("");
+  const [price, setPrice] = useState("");
+  const [image_url, setImage] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [supplier, setSupplier] = useState("");
 
   const dispatch = useDispatch();
 
@@ -18,9 +21,17 @@ function ItemForm() {
     setDescription(e.target.value);
   };
 
+  const handleSupplierChange = (e) => {
+    setSupplier(e.target.value);
+  }
+
   const handlePriceChange = (e) => {
-    setPrice(e.target.value);
+    setPrice(Number(e.target.value));
   };
+
+  const handleQuantityChange = (e) => {
+    setQuantity(Number(e.target.value));
+  }
 
   const handleImageChange = (e) => {
     setImage(e.target.value);
@@ -30,16 +41,18 @@ function ItemForm() {
     // prevent the page from refreshing when the form is submitted
     e.preventDefault();
     const newItem = {
-      itemName,
+      name,
       description,
       price,
-      image,
+      image_url,
+      quantity,
+      supplier,
     };
-    dispatch(addItem(newItem));
-    // Clear tinputs
+    dispatch(addItemAsync(newItem));
+    // Clear inputs
     setItemName("");
     setDescription("");
-    setPrice(0);
+    setPrice("");
     setImage("");
   };
 
@@ -47,37 +60,79 @@ function ItemForm() {
     // Clear the form inputs
     setItemName("");
     setDescription("");
-    setPrice(0);
+    setPrice("");
     setImage("");
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Item Name:
-        <input type="text" value={itemName} onChange={handleItemNameChange} />
-      </label>
-      <br />
-      <label>
-        Description:
-        <textarea value={description} onChange={handleDescriptionChange} />
-      </label>
-      <br />
-      <label>
-        Price:
-        <input type="text" value={price} onChange={handlePriceChange} />
-      </label>
-      <br />
-      <label>
-        Image:
-        <input type="text" value={image} onChange={handleImageChange} />
-      </label>
-      <br />
-      <button type="submit">Add Item</button>
-      <button type="button" onClick={handleClear}>
-        Clear
-      </button>
-    </form>
+    <div class="inv-form">
+      <form onSubmit={handleSubmit}>
+        <label>
+          Item Name:
+          <input
+            class="normal-input"
+            type="text"
+            value={name}
+            onChange={handleItemNameChange}
+          />
+        </label>
+        <br />
+        <label>
+          Description:
+          <textarea
+            class="normal-input"
+            value={description}
+            onChange={handleDescriptionChange}
+          />
+        </label>
+        <br />
+        <label>
+          Supplier:
+          <textarea
+            class="normal-input"
+            value={supplier}
+            onChange={handleSupplierChange}
+          />
+        </label>
+        <br />
+        <label>
+          Price:
+          <input
+            class="normal-input"
+            type="text"
+            value={price}
+            onChange={handlePriceChange}
+          />
+        </label>
+        <br />
+        <label>
+          Quantity:
+          <input
+            class="normal-input"
+            type="text"
+            value={quantity}
+            onChange={handleQuantityChange}
+          />
+        </label>
+        <br />
+        <label>
+          Image:
+          <input
+            class="normal-input"
+            type="text"
+            value={image_url}
+            onChange={handleImageChange}
+          />
+        </label>
+        <br />
+        <button class="button" type="submit">
+          Add Item
+        </button>
+        <button class="button" type="button" onClick={handleClear}>
+          Clear
+        </button>
+      </form>
+    </div>
   );
 }
 

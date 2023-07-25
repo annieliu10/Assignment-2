@@ -54,3 +54,67 @@
     transform: rotate(360deg);
   }
 }
+
+.button {
+  padding: 12px 20px;
+  display: inline-block;
+  background-color: #c18589;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.button:hover {
+  background-color: #9f577a;
+}
+
+.inv-form {
+  border-radius: 5px;
+  background-color: #e8b9b9;
+  padding: 20px;
+}
+
+.normal-input {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.flex-item {
+  flex: 1;
+}
+
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.item-card {
+  background-color: #a0c4dd;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.item-card h3 {
+  margin-top: 0;
+}
+
+.item-card p {
+  margin-bottom: 5px;
+}
+
+.item-card img {
+  max-inline-size: 50%;
+}
+
+.image {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100%; /* set to 'auto' in IE11 to avoid distortions */
+}

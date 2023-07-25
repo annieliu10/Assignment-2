@@ -1,24 +1,23 @@
 import React, { useState, useEffect } from "react";
 import ItemDetail from "./ItemDetail";
+import { useSelector, useDispatch } from "react-redux";
+
 import { deleteItem } from "./actions";
-import { useDispatch } from "react-redux";
-import { sortItems } from "./actions";
+import "./App.css";
+import axios from "axios";
 
-function List({ items }) {
+import {
+  getItemsAsync,
+  updateItemAsync,
+} from "./redux/thunks";
+
+function List() {
   const [selectedItem, setSelectedItem] = useState(null);
-  const [itemList, setItemList] = useState([]);
+
+  const items = useSelector((state) => state.items.list);
   const dispatch = useDispatch();
-  const [filterName, setFilterName] = useState("");
-
-  const handleFilterChange = (e) => {
-    setFilterName(e.target.value);
-  };
-
-  const itemNames = [...new Set(items.map((item) => item.itemName))];
-
-  const filteredItems = items.filter((item) =>
-    filterName ? item.itemName.toLowerCase() === filterName.toLowerCase() : true
-  );
+  const [updatedPrice, setUpdatedPrice] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleItemClick = (item) => {
     setSelectedItem(item);
@@ -28,45 +27,66 @@ function List({ items }) {
     setSelectedItem(null);
   };
 
-  const handleDelete = (existingItem) => {
-    dispatch(deleteItem(existingItem));
+  const handleSearch = async (event) => {
+    const searchTerm = event.target.value;
+    setSearchTerm(searchTerm);
+  
+    try {
+      const response = await axios.get(`http://localhost:3000/items/${searchTerm}`);
+      const filteredItems = response.data;
+      // Update the state or perform any additional actions with the filtered items
+      console.log("Filtered Items:", filteredItems);
+    } catch (error) {
+      console.error("Error filtering items:", error);
+    }
   };
 
-  const handleSort = () => {
-    dispatch(sortItems());
+  const handleDelete = (item) => {
+    axios
+      .delete(`http://localhost:3000/items/${item.name}`)
+      .then((response) => {
+        // Item deleted successfully
+        // You can perform any additional actions or update the state as needed
+        console.log("Item deleted:", response.data);
+        // dispatch(deleteItem(item));
+      })
+      .catch((error) => {
+        // Error occurred while deleting item
+        // You can handle the error and display an error message if necessary
+        console.error("Error deleting item:", error);
+      });
+
+    window.location.reload();
   };
+
+  const handlePriceChange = (event) => {
+    setUpdatedPrice(event.target.value);
+  };
+
+  const handleSubmitPrice = (item) => {
+    const updatedItem = { ...item, price: Number(updatedPrice) };
+    dispatch(updateItemAsync(updatedItem));
+    setUpdatedPrice(updatedPrice);
+    window.location.reload();
+  };
+
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
-    setItemList(items);
-  }, [items]);
+    dispatch(getItemsAsync());
+  }, []);
 
   return (
     <div>
-      <label>
-        Filter by Name:
-        <select value={filterName} onChange={handleFilterChange}>
-          <option value="">All</option>
-          {itemNames.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <ul>
-        {filteredItems.map((item) => (
-          <li key={item.id}>
-            <h3>{item.itemName}</h3>
-            <p>Description: {item.description}</p>
-            <p>Price: {item.price}</p>
-          </li>
-        ))}
-      </ul>
-      <button onClick={handleSort} className="sort-button">
-        Sort Cheapest to Expensive
-      </button>
-
-      {itemList.map((item) => (
+      <input
+        type="text"
+        placeholder="Search item..."
+        value={searchTerm}
+        onChange={handleSearch}
+      />
+    {filteredItems.map((item) => (
         <div
           key={item.id}
           onClick={(event) => {
@@ -74,12 +94,30 @@ function List({ items }) {
             if (event.target.matches("button")) {
               return;
             }
+            if (event.target.matches("input")) {
+              return;
+            }
+
             handleItemClick(item);
           }}
         >
-          <h3>{item.itemName}</h3>
-          <img src={item.image} alt={item.itemName} />
-          <button onClick={() => handleDelete(item.id)}>Delete</button>
+          <h4>{item.name}</h4>
+
+          <img class="image" src={item.image_url} alt={item.name} />
+          <div className="price-input">
+            <input
+              type="number"
+              value={updatedPrice}
+              onChange={handlePriceChange}
+            />
+            <button className="button" onClick={() => handleSubmitPrice(item)}>
+              Submit
+            </button>
+          </div>
+          <br />
+          <button class="button" onClick={() => handleDelete(item)}>
+            Delete
+          </button>
         </div>
       ))}
       {selectedItem && <ItemDetail item={selectedItem} onClose={handleClose} />}
