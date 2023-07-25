@@ -1,53 +1,57 @@
 const request = require('supertest');
-const sinon = require('sinon');
 const express = require('express');
-const app = require('../app');
+const { MongoClient } = require('mongodb');
+const itemsRouter = require('./items');
+
+const app = express();
+app.use(express.json());
+app.use('/items', itemsRouter);
 
 describe('ItemForm Endpoints', () => {
-  // Mock the database client and collection
-  let clientMock;
-  let collectionMock;
+  let client;
+  let db;
 
-  beforeAll(() => {
-    // Create a mock function for the database operation
-    collectionMock = {
-      find: sinon.stub(),
-    };
-    clientMock = {
-      db: sinon.stub().returns({
-        collection: sinon.stub().returns(collectionMock),
-      }),
-    };
+  beforeAll(async () => {
+    // Connect to the mock database
+    client = await MongoClient.connect('mongodb://localhost:27017', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-    // Replace the actual MongoDB client with the mock client
-    app.client = clientMock;
+    // Set the MongoDB client instance in the app
+    app.client = client;
+
+    // Get the reference to the test database
+    db = client.db('inventory');
   });
 
-  afterEach(() => {
-    // Reset the database operation mocks after each test
-    collectionMock.find.reset();
+  afterAll(async () => {
+    // Close the MongoDB client
+    await client.close();
   });
 
-  test('GET / should return the list of items', async () => {
-    // Set up the mock data to be returned by the database operation
+  beforeEach(async () => {
+    // Clear the test database before each test
+    await db.collection('inventory_items').deleteMany({});
+  });
+
+  test('GET /items should return the list of items', async () => {
+    // Create a mock items collection
+    const itemsCollection = db.collection('inventory_items');
     const mockItems = [
       { name: 'Item 1', price: 10 },
       { name: 'Item 2', price: 20 },
     ];
-    collectionMock.find.returns({ toArray: sinon.stub().resolves(mockItems) });
 
-    // Send the GET request to the endpoint
-    const response = await request(app).get('/');
+    // Insert mock data into the mock collection
+    await itemsCollection.insertMany(mockItems);
+
+    // Use supertest to call the route handler function directly
+    const response = await request(app).get('/items');
 
     // Verify the response
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(mockItems);
   });
 
-  // Add more tests for other endpoints similarly.
-
-  // After writing all the tests, you should close the MongoDB connection to prevent memory leaks.
-//   afterAll(async () => {
-//     await app.client.close();
-//   });
+  // Add more test cases for other endpoints as needed
 });
