@@ -9,7 +9,7 @@
     "install-client": "cd my-app && npm install",
     "build-client": "cd my-app && npm build",
     "start-client": "cd my-app && npm run start",
-    "test": "jest --verbose"
+    "test": "cd server && npm test && cd ../my-app && npm test"
   },
   "keywords": [],
   "author": "",
