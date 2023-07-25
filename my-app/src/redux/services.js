@@ -1,5 +1,5 @@
 const getItems = async () => {
-  const response = await fetch("http://localhost:3000/items", {
+  const response = await fetch("https://inventoryapps.onrender.com/items", {
     method: "GET",
   });
   const data = await response.json();
@@ -7,7 +7,7 @@ const getItems = async () => {
 };
 
 const getItem = async (item) => {
-  const response = await fetch(`http://localhost:3000/items/${item.name}`, {
+  const response = await fetch(`https://inventoryapps.onrender.com/items/${item.name}`, {
     method: "GET",
   });
   const data = await response.json();
@@ -15,7 +15,7 @@ const getItem = async (item) => {
 };
 
 const addItem = async (item) => {
-  const response = await fetch("http://localhost:3000/items", {
+  const response = await fetch("https://inventoryapps.onrender.com/items", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),
@@ -28,7 +28,7 @@ const addItem = async (item) => {
 };
 
 const sortItems = async () => {
-  const response = await fetch("http://localhost:3000/items/sort/items", {
+  const response = await fetch("https://inventoryapps.onrender.com/items/sort/items", {
     method: "GET",
   });
   const data = await response.json();
@@ -36,7 +36,7 @@ const sortItems = async () => {
 };
 
 const updateItem = async (item) => {
-  const response = await fetch(`http://localhost:3000/items/${item.name}`, {
+  const response = await fetch(`https://inventoryapps.onrender.com/items/${item.name}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(item),

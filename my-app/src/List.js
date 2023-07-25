@@ -32,7 +32,7 @@ function List() {
     setSearchTerm(searchTerm);
   
     try {
-      const response = await axios.get(`http://localhost:3000/items/${searchTerm}`);
+      const response = await axios.get(`https://inventoryapps.onrender.com/items/${searchTerm}`);
       const filteredItems = response.data;
       // Update the state or perform any additional actions with the filtered items
       console.log("Filtered Items:", filteredItems);
@@ -43,7 +43,7 @@ function List() {
 
   const handleDelete = (item) => {
     axios
-      .delete(`http://localhost:3000/items/${item.name}`)
+      .delete(`https://inventoryapps.onrender.com/items/${item.name}`)
       .then((response) => {
         // Item deleted successfully
         // You can perform any additional actions or update the state as needed
