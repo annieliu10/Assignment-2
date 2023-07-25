@@ -8,7 +8,8 @@
     "start-server": "cd server && npm start",
     "install-client": "cd my-app && npm install",
     "build-client": "cd my-app && npm build",
-    "start-client": "cd my-app && npm run start"
+    "start-client": "cd my-app && npm run start",
+    "test": "jest --verbose"
   },
   "keywords": [],
   "author": "",
